@@ -59,7 +59,7 @@ docker run --rm --network host \
   ghcr.io/erenozgu/asterisk-exporter:latest -asterisk.timezone UTC
 ```
 
-A hardened systemd unit is in [`deploy/systemd/`](deploy/systemd/asterisk-exporter.service). To build from source: `go build ./cmd/asterisk-exporter`.
+A hardened systemd unit is in [`deploy/systemd/`](deploy/systemd/asterisk-exporter.service). To build from source: `go build ./cmd/asterisk-exporter`. If you would rather not do this by hand, the Ansible roles in [asterisk-gcp-iac](https://github.com/ErenOzgu/asterisk-gcp-iac) install a pinned release (checksum verified) together with its AMI user and unit.
 
 **3. Scrape it:**
 
