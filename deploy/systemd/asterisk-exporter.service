@@ -1,0 +1,30 @@
+[Unit]
+Description=Prometheus exporter for Asterisk (AMI)
+Documentation=https://github.com/ErenOzgu/asterisk-exporter
+After=network-online.target asterisk.service
+Wants=network-online.target
+
+[Service]
+# /etc/asterisk-exporter.env (mode 0600, root-owned):
+#   ASTERISK_AMI_USERNAME=exporter
+#   ASTERISK_AMI_SECRET=...
+EnvironmentFile=/etc/asterisk-exporter.env
+# AMI prints local time without an offset: tell the exporter which zone Asterisk runs in.
+ExecStart=/usr/local/bin/asterisk-exporter -web.listen-address=127.0.0.1:9650 -asterisk.timezone=UTC
+Restart=on-failure
+RestartSec=5
+
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+SystemCallFilter=@system-service
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="t d">
+  <title id="t">asterisk-exporter</title>
+  <desc id="d">Prometheus exporter for Asterisk, reading the Manager Interface: calls, PJSIP endpoints and ConfBridge rooms.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2230"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f68d1f" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#f68d1f" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="420" fill="url(#bg)"/>
+  <rect width="1280" height="420" fill="url(#grid)"/>
+  <rect width="640" height="420" fill="url(#glow)"/>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <text x="64" y="128" font-size="13" letter-spacing="3" fill="#f68d1f" font-weight="600">PROMETHEUS EXPORTER  ·  ASTERISK</text>
+    <text x="62" y="196" font-size="58" font-weight="700" fill="#f0f6fc">asterisk-exporter</text>
+    <text x="64" y="244" font-size="22" fill="#9aa7b8">Metrics straight from the Asterisk Manager Interface:</text>
+    <text x="64" y="274" font-size="22" fill="#9aa7b8">calls, PJSIP endpoints, qualify latency, ConfBridge rooms.</text>
+
+    <g font-size="14" font-weight="600" fill="#d0d7de">
+      <rect x="64" y="304" width="150" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <text x="139" y="326" text-anchor="middle">0 dependencies</text>
+      <rect x="226" y="304" width="150" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <text x="301" y="326" text-anchor="middle">read-only AMI</text>
+      <rect x="388" y="304" width="212" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <text x="494" y="326" text-anchor="middle">tested on Asterisk 18 · 20</text>
+    </g>
+  </g>
+
+  <g transform="translate(700 56)">
+    <rect width="516" height="308" rx="12" fill="#0b0f14" stroke="#ffffff" stroke-opacity="0.12"/>
+    <rect width="516" height="38" rx="12" fill="#ffffff" fill-opacity="0.05"/>
+    <circle cx="22" cy="19" r="6" fill="#f85149" fill-opacity="0.85"/>
+    <circle cx="42" cy="19" r="6" fill="#d29922" fill-opacity="0.85"/>
+    <circle cx="62" cy="19" r="6" fill="#3fb950" fill-opacity="0.85"/>
+    <text x="258" y="24" text-anchor="middle" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#8b949e">curl localhost:9650/metrics</text>
+    <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="13" fill="#8b949e">
+      <text x="22" y="76" fill="#6e7681"># HELP asterisk_up  AMI reachable (1) or not (0)</text>
+      <text x="22" y="108"><tspan fill="#79c0ff">asterisk_up</tspan> <tspan fill="#3fb950">1</tspan></text>
+      <text x="22" y="134"><tspan fill="#79c0ff">asterisk_calls_active</tspan> <tspan fill="#e6edf3">3</tspan></text>
+      <text x="22" y="160"><tspan fill="#79c0ff">asterisk_channels</tspan>{<tspan fill="#ffa657">state</tspan>=<tspan fill="#a5d6ff">"up"</tspan>} <tspan fill="#e6edf3">6</tspan></text>
+      <text x="22" y="186"><tspan fill="#79c0ff">asterisk_confbridge_parties</tspan>{<tspan fill="#ffa657">conference</tspan>=<tspan fill="#a5d6ff">"700"</tspan>} <tspan fill="#e6edf3">2</tspan></text>
+      <text x="22" y="212"><tspan fill="#79c0ff">asterisk_pjsip_endpoint_up</tspan>{<tspan fill="#ffa657">endpoint</tspan>=<tspan fill="#a5d6ff">"1001"</tspan>} <tspan fill="#3fb950">1</tspan></text>
+      <text x="22" y="238"><tspan fill="#79c0ff">asterisk_pjsip_endpoint_up</tspan>{<tspan fill="#ffa657">endpoint</tspan>=<tspan fill="#a5d6ff">"1003"</tspan>} <tspan fill="#f85149">0</tspan></text>
+      <text x="22" y="264"><tspan fill="#79c0ff">asterisk_pjsip_contact_rtt_seconds</tspan>{<tspan fill="#ffa657">endpoint</tspan>=<tspan fill="#a5d6ff">"1001"</tspan>} <tspan fill="#e6edf3">0.0006</tspan></text>
+      <text x="22" y="290" fill="#6e7681">…</text>
+    </g>
+  </g>
+</svg>

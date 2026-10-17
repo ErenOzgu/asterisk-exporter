@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROMETHEUS_VERSION: "2.55.1"
+
+jobs:
+  go:
+    name: Go ${{ matrix.go }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.21", "1.23"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false # no third-party dependencies, so no go.sum to cache on
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - name: go vet
+        run: go vet ./...
+      - name: go test (race)
+        run: go test ./... -race -count=1
+
+  prometheus:
+    name: Prometheus rules, dashboard and metric lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: false
+      - name: Install promtool
+        run: |
+          curl -fsSL "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz" \
+            | tar xz --strip-components=1 -C /usr/local/bin "prometheus-${PROMETHEUS_VERSION}.linux-amd64/promtool"
+          promtool --version
+      - name: Alert rules and their unit tests
+        run: |
+          promtool check rules deploy/prometheus/alerts.yml
+          promtool test rules deploy/prometheus/alerts_test.yml
+          promtool check config deploy/prometheus/prometheus.yml
+      - name: Dashboard queries are valid PromQL
+        run: |
+          python3 hack/check-dashboard.py rules deploy/grafana/dashboards/asterisk.json "$RUNNER_TEMP/dashboard-rules.yml"
+          promtool check rules "$RUNNER_TEMP/dashboard-rules.yml"
+      - name: Exporter output passes promtool check metrics
+        run: |
+          go build -o "$RUNNER_TEMP/amisim" ./cmd/amisim
+          go build -o "$RUNNER_TEMP/exporter" ./cmd/asterisk-exporter
+          "$RUNNER_TEMP/amisim" -listen 127.0.0.1:5038 -user exporter -secret demo-secret &
+          sleep 1
+          ASTERISK_AMI_USERNAME=exporter ASTERISK_AMI_SECRET=demo-secret \
+            "$RUNNER_TEMP/exporter" -web.listen-address 127.0.0.1:9650 -collect.sip &
+          sleep 1
+          curl -sf http://127.0.0.1:9650/metrics > "$RUNNER_TEMP/metrics.txt"
+          grep -q '^asterisk_up 1$' "$RUNNER_TEMP/metrics.txt"
+          promtool check metrics < "$RUNNER_TEMP/metrics.txt"
+
+  integration:
+    name: Real Asterisk (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04] # Asterisk 18 and 20 from the distribution
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: false
+      - name: Install Asterisk
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends asterisk
+          sudo systemctl stop asterisk || true
+          asterisk -V
+      - name: Exporter against a real Asterisk
+        shell: bash # with pipefail, so a failing test fails the step despite `| tee`
+        run: sudo env "PATH=$PATH" ./hack/integration-test.sh 2>&1 | tee "$RUNNER_TEMP/integration.log"
+      - name: Surface the log on failure
+        if: failure()
+        run: |
+          msg="$(tail -c 6000 "$RUNNER_TEMP/integration.log" | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e ':a;N;$!ba;s/\n/%0A/g')"
+          echo "::error title=integration log (${{ matrix.os }})::${msg}"
+
+  demo:
+    name: Demo stack (compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Simulated Asterisk, exporter, Prometheus and Grafana
+        shell: bash
+        run: ./hack/demo-smoke-test.sh 2>&1 | tee "$RUNNER_TEMP/demo.log"
+      - name: Surface the log on failure
+        if: failure()
+        run: |
+          msg="$(tail -c 6000 "$RUNNER_TEMP/demo.log" | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e ':a;N;$!ba;s/\n/%0A/g')"
+          echo "::error title=demo log::${msg}"

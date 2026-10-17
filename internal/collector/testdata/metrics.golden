@@ -1,0 +1,110 @@
+# HELP asterisk_calls_active Active calls: distinct Linkedid values among listed channels. All legs of a call share one.
+# TYPE asterisk_calls_active gauge
+asterisk_calls_active 2
+# HELP asterisk_channels Channels by state, as listed by CoreShowChannels (internal channels are not listed).
+# TYPE asterisk_channels gauge
+asterisk_channels{state="busy"} 0
+asterisk_channels{state="dialing"} 0
+asterisk_channels{state="dialing_offhook"} 0
+asterisk_channels{state="down"} 0
+asterisk_channels{state="offhook"} 0
+asterisk_channels{state="pre_ring"} 0
+asterisk_channels{state="ring"} 0
+asterisk_channels{state="ringing"} 1
+asterisk_channels{state="rsrvd"} 0
+asterisk_channels{state="unknown"} 0
+asterisk_channels{state="up"} 3
+# HELP asterisk_collector_duration_seconds Duration of the collector in the last scrape.
+# TYPE asterisk_collector_duration_seconds gauge
+asterisk_collector_duration_seconds{collector="channels"} 0
+asterisk_collector_duration_seconds{collector="confbridge"} 0
+asterisk_collector_duration_seconds{collector="core"} 0
+asterisk_collector_duration_seconds{collector="pjsip"} 0
+asterisk_collector_duration_seconds{collector="sip"} 0
+# HELP asterisk_collector_success Whether the collector succeeded (1) or failed (0) in the last scrape.
+# TYPE asterisk_collector_success gauge
+asterisk_collector_success{collector="channels"} 1
+asterisk_collector_success{collector="confbridge"} 1
+asterisk_collector_success{collector="core"} 1
+asterisk_collector_success{collector="pjsip"} 1
+asterisk_collector_success{collector="sip"} 1
+# HELP asterisk_confbridge_parties Participants in the ConfBridge conference.
+# TYPE asterisk_confbridge_parties gauge
+asterisk_confbridge_parties{conference="700"} 3
+asterisk_confbridge_parties{conference="701"} 1
+# HELP asterisk_confbridge_rooms Active ConfBridge conferences.
+# TYPE asterisk_confbridge_rooms gauge
+asterisk_confbridge_rooms 2
+# HELP asterisk_core_current_channels Channels currently allocated in Asterisk, internal ones included (AMI field CoreCurrentCalls).
+# TYPE asterisk_core_current_channels gauge
+asterisk_core_current_channels 7
+# HELP asterisk_core_last_reload_time_seconds Time of the last Asterisk reload since the Unix epoch, in seconds.
+# TYPE asterisk_core_last_reload_time_seconds gauge
+asterisk_core_last_reload_time_seconds 1.7908506e+09
+# HELP asterisk_core_max_calls Configured maxcalls limit; 0 means unlimited.
+# TYPE asterisk_core_max_calls gauge
+asterisk_core_max_calls 100
+# HELP asterisk_core_start_time_seconds Start time of Asterisk since the Unix epoch, in seconds. Uptime is time() - this.
+# TYPE asterisk_core_start_time_seconds gauge
+asterisk_core_start_time_seconds 1.7908434e+09
+# HELP asterisk_exporter_build_info Build information about the exporter.
+# TYPE asterisk_exporter_build_info gauge
+asterisk_exporter_build_info{goversion="goX",version="test"} 1
+# HELP asterisk_info Asterisk version information; the value is always 1.
+# TYPE asterisk_info gauge
+asterisk_info{ami_version="9.0.0",system_name="",version="20.6.0"} 1
+# HELP asterisk_pjsip_contact_rtt_seconds Qualify round-trip time of the endpoint's reachable contacts (slowest if several).
+# TYPE asterisk_pjsip_contact_rtt_seconds gauge
+asterisk_pjsip_contact_rtt_seconds{endpoint="1001"} 0.004
+asterisk_pjsip_contact_rtt_seconds{endpoint="1002"} 0.0008
+# HELP asterisk_pjsip_contacts PJSIP contacts by qualify status.
+# TYPE asterisk_pjsip_contacts gauge
+asterisk_pjsip_contacts{status="nonqualified"} 1
+asterisk_pjsip_contacts{status="reachable"} 3
+asterisk_pjsip_contacts{status="removed"} 0
+asterisk_pjsip_contacts{status="unknown"} 0
+asterisk_pjsip_contacts{status="unreachable"} 1
+# HELP asterisk_pjsip_endpoint_active_channels Channels currently active on the PJSIP endpoint.
+# TYPE asterisk_pjsip_endpoint_active_channels gauge
+asterisk_pjsip_endpoint_active_channels{endpoint="1001"} 1
+asterisk_pjsip_endpoint_active_channels{endpoint="1002"} 0
+asterisk_pjsip_endpoint_active_channels{endpoint="1003"} 0
+asterisk_pjsip_endpoint_active_channels{endpoint="1004"} 2
+# HELP asterisk_pjsip_endpoint_up Whether the PJSIP endpoint is available (1) or unavailable/invalid (0).
+# TYPE asterisk_pjsip_endpoint_up gauge
+asterisk_pjsip_endpoint_up{endpoint="1001"} 1
+asterisk_pjsip_endpoint_up{endpoint="1002"} 1
+asterisk_pjsip_endpoint_up{endpoint="1003"} 0
+asterisk_pjsip_endpoint_up{endpoint="1004"} 1
+# HELP asterisk_pjsip_endpoints PJSIP endpoints by device state.
+# TYPE asterisk_pjsip_endpoints gauge
+asterisk_pjsip_endpoints{state="busy"} 0
+asterisk_pjsip_endpoints{state="in_use"} 1
+asterisk_pjsip_endpoints{state="in_use_ringing"} 1
+asterisk_pjsip_endpoints{state="invalid"} 0
+asterisk_pjsip_endpoints{state="not_in_use"} 1
+asterisk_pjsip_endpoints{state="on_hold"} 0
+asterisk_pjsip_endpoints{state="ringing"} 0
+asterisk_pjsip_endpoints{state="unavailable"} 1
+asterisk_pjsip_endpoints{state="unknown"} 0
+# HELP asterisk_scrape_duration_seconds Duration of the whole scrape.
+# TYPE asterisk_scrape_duration_seconds gauge
+asterisk_scrape_duration_seconds 0
+# HELP asterisk_sip_peer_up Whether the chan_sip peer is reachable (1) or not (0).
+# TYPE asterisk_sip_peer_up gauge
+asterisk_sip_peer_up{peer="legacy1"} 1
+asterisk_sip_peer_up{peer="legacy2"} 1
+asterisk_sip_peer_up{peer="legacy3"} 0
+asterisk_sip_peer_up{peer="legacy4"} 1
+asterisk_sip_peer_up{peer="legacy5"} 0
+# HELP asterisk_sip_peers chan_sip peers by qualify status.
+# TYPE asterisk_sip_peers gauge
+asterisk_sip_peers{status="lagged"} 1
+asterisk_sip_peers{status="ok"} 1
+asterisk_sip_peers{status="other"} 0
+asterisk_sip_peers{status="unknown"} 0
+asterisk_sip_peers{status="unmonitored"} 2
+asterisk_sip_peers{status="unreachable"} 1
+# HELP asterisk_up Whether the last scrape could log in to the Asterisk Manager Interface (1) or not (0).
+# TYPE asterisk_up gauge
+asterisk_up 1

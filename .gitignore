@@ -1,0 +1,5 @@
+/asterisk-exporter
+/amisim
+/dist/
+*.test
+.env

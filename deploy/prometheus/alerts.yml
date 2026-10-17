@@ -1,0 +1,75 @@
+groups:
+  - name: asterisk
+    rules:
+      - alert: AsteriskExporterDown
+        expr: up{job="asterisk"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "asterisk-exporter on {{ $labels.instance }} is not answering"
+          description: "Prometheus cannot scrape the exporter, so nothing is known about Asterisk."
+
+      - alert: AsteriskDown
+        expr: asterisk_up == 0
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: "Asterisk on {{ $labels.instance }} is unreachable"
+          description: "The exporter runs but cannot log in to the Asterisk Manager Interface: Asterisk is down, AMI is disabled, or the credentials changed."
+
+      - alert: AsteriskCollectorFailing
+        expr: asterisk_collector_success == 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Collector {{ $labels.collector }} fails on {{ $labels.instance }}"
+          description: "Check the exporter log. Typical causes: the module is not loaded, or the AMI user lacks the write permission for it."
+
+      - alert: AsteriskRestarted
+        expr: changes(asterisk_core_start_time_seconds[15m]) > 0
+        labels: { severity: info }
+        annotations:
+          summary: "Asterisk on {{ $labels.instance }} restarted"
+
+      - alert: AsteriskEndpointUnavailable
+        expr: asterisk_pjsip_endpoint_up == 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "PJSIP endpoint {{ $labels.endpoint }} is unavailable on {{ $labels.instance }}"
+          description: "No reachable contact for this endpoint for 5 minutes."
+
+      - alert: AsteriskManyEndpointsUnavailable
+        expr: |
+          count by (instance) (asterisk_pjsip_endpoint_up == 0)
+            / count by (instance) (asterisk_pjsip_endpoint_up) > 0.5
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "More than half of the PJSIP endpoints on {{ $labels.instance }} are unavailable"
+          description: "A network or registration problem is more likely than many broken devices."
+
+      - alert: AsteriskContactRoundTripHigh
+        expr: asterisk_pjsip_contact_rtt_seconds > 0.25
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Qualify round trip to {{ $labels.endpoint }} is {{ $value | humanizeDuration }}"
+          description: "Sustained high latency between Asterisk and the endpoint hurts voice quality."
+
+      - alert: AsteriskNearMaxCalls
+        expr: |
+          asterisk_core_max_calls > 0
+            and asterisk_core_current_channels / asterisk_core_max_calls > 0.9
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "Asterisk on {{ $labels.instance }} is above 90% of maxcalls"
+          description: "Asterisk counts channels against the maxcalls limit; new calls will be refused when it is reached."
+
+      - alert: AsteriskScrapeSlow
+        expr: asterisk_scrape_duration_seconds > 3
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "AMI on {{ $labels.instance }} answers slowly ({{ $value | humanizeDuration }} per scrape)"

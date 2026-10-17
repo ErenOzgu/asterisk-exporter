@@ -1,0 +1,114 @@
+# Run with: promtool test rules deploy/prometheus/alerts_test.yml
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: Asterisk unreachable pages after one minute
+    interval: 1m
+    input_series:
+      - series: 'asterisk_up{instance="pbx1"}'
+        values: '1 1 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: AsteriskDown
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: AsteriskDown
+        exp_alerts:
+          - exp_labels: { severity: critical, instance: pbx1 }
+            exp_annotations:
+              summary: "Asterisk on pbx1 is unreachable"
+              description: "The exporter runs but cannot log in to the Asterisk Manager Interface: Asterisk is down, AMI is disabled, or the credentials changed."
+
+  - name: One endpoint down for five minutes warns, a brief flap does not
+    interval: 1m
+    input_series:
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1001"}'
+        values: '1 0 0 0 0 0 0 0'
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1002"}'
+        values: '1 0 1 1 1 1 1 1'
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1003"}'
+        values: '1 1 1 1 1 1 1 1'
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1004"}'
+        values: '1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: AsteriskEndpointUnavailable
+        exp_alerts:
+          - exp_labels: { severity: warning, instance: pbx1, endpoint: "1001" }
+            exp_annotations:
+              summary: "PJSIP endpoint 1001 is unavailable on pbx1"
+              description: "No reachable contact for this endpoint for 5 minutes."
+      - eval_time: 7m
+        alertname: AsteriskManyEndpointsUnavailable
+        exp_alerts: []
+
+  - name: Majority of endpoints down is critical
+    interval: 1m
+    input_series:
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1001"}'
+        values: '0 0 0 0 0 0 0'
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1002"}'
+        values: '0 0 0 0 0 0 0'
+      - series: 'asterisk_pjsip_endpoint_up{instance="pbx1",endpoint="1003"}'
+        values: '1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: AsteriskManyEndpointsUnavailable
+        exp_alerts:
+          - exp_labels: { severity: critical, instance: pbx1 }
+            exp_annotations:
+              summary: "More than half of the PJSIP endpoints on pbx1 are unavailable"
+              description: "A network or registration problem is more likely than many broken devices."
+
+  - name: maxcalls alert needs a limit and ignores unlimited systems
+    interval: 1m
+    input_series:
+      - series: 'asterisk_core_current_channels{instance="limited"}'
+        values: '95 95 95 95'
+      - series: 'asterisk_core_max_calls{instance="limited"}'
+        values: '100 100 100 100'
+      - series: 'asterisk_core_current_channels{instance="unlimited"}'
+        values: '500 500 500 500'
+      - series: 'asterisk_core_max_calls{instance="unlimited"}'
+        values: '0 0 0 0'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: AsteriskNearMaxCalls
+        exp_alerts:
+          - exp_labels: { severity: warning, instance: limited }
+            exp_annotations:
+              summary: "Asterisk on limited is above 90% of maxcalls"
+              description: "Asterisk counts channels against the maxcalls limit; new calls will be refused when it is reached."
+
+  - name: A restart is announced once
+    interval: 1m
+    input_series:
+      - series: 'asterisk_core_start_time_seconds{instance="pbx1"}'
+        values: '1000 1000 1000 5000 5000 5000'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: AsteriskRestarted
+        exp_alerts:
+          - exp_labels: { severity: info, instance: pbx1 }
+            exp_annotations:
+              summary: "Asterisk on pbx1 restarted"
+      - eval_time: 2m
+        alertname: AsteriskRestarted
+        exp_alerts: []
+
+  - name: Failing collector warns after five minutes
+    interval: 1m
+    input_series:
+      - series: 'asterisk_collector_success{instance="pbx1",collector="confbridge"}'
+        values: '0 0 0 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: AsteriskCollectorFailing
+        exp_alerts:
+          - exp_labels: { severity: warning, instance: pbx1, collector: confbridge }
+            exp_annotations:
+              summary: "Collector confbridge fails on pbx1"
+              description: "Check the exporter log. Typical causes: the module is not loaded, or the AMI user lacks the write permission for it."

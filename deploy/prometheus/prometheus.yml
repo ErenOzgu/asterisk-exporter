@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s # the exporter's own budget (-ami.timeout, 5s) is shorter
+
+rule_files:
+  - alerts.yml
+
+scrape_configs:
+  - job_name: asterisk
+    static_configs:
+      - targets: ["exporter:9650"]
