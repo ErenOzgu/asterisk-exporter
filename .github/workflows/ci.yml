@@ -18,7 +18,7 @@ env:
 jobs:
   go:
     name: Go ${{ matrix.go }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -38,7 +38,7 @@ jobs:
 
   prometheus:
     name: Prometheus rules, dashboard and metric lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -102,7 +102,7 @@ jobs:
 
   demo:
     name: Demo stack (compose)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Simulated Asterisk, exporter, Prometheus and Grafana
