@@ -46,9 +46,15 @@ jobs:
           go-version: "1.23"
           cache: false
       - name: Install promtool
+        env:
+          # From the sha256sums.txt of the Prometheus release; the tarball is checked against it before it is unpacked.
+          PROMETHEUS_SHA256: 19700bdd42ec31ee162e4079ebda4cd0a44432df4daa637141bdbea4b1cd8927
         run: |
-          curl -fsSL "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz" \
-            | tar xz --strip-components=1 -C /usr/local/bin "prometheus-${PROMETHEUS_VERSION}.linux-amd64/promtool"
+          set -euo pipefail
+          tarball="prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz"
+          curl -fsSL -o "${RUNNER_TEMP}/${tarball}" "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/${tarball}"
+          echo "${PROMETHEUS_SHA256}  ${RUNNER_TEMP}/${tarball}" | sha256sum -c -
+          tar xzf "${RUNNER_TEMP}/${tarball}" --strip-components=1 -C /usr/local/bin "prometheus-${PROMETHEUS_VERSION}.linux-amd64/promtool"
           promtool --version
       - name: Alert rules and their unit tests
         run: |
