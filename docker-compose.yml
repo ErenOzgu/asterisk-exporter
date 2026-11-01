@@ -33,7 +33,7 @@ services:
     ports: ["127.0.0.1:9090:9090"]
 
   grafana:
-    image: grafana/grafana:11.3.0@sha256:a0f881232a6fb71a0554a47d0fe2203b6888fe77f4cefb7ea62bed7eb54e13c3
+    image: grafana/grafana:11.3.9@sha256:b5845559a3d8073f1c2670929cde4039a0afc6fa8d4f71402567c53de8c90b80
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
