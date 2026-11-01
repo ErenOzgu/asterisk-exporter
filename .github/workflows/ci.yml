@@ -24,8 +24,8 @@ jobs:
       matrix:
         go: ["1.21", "1.23"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ${{ matrix.go }}
           cache: false # no third-party dependencies, so no go.sum to cache on
@@ -40,8 +40,8 @@ jobs:
     name: Prometheus rules, dashboard and metric lint
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: "1.23"
           cache: false
@@ -80,8 +80,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04] # Asterisk 18 and 20 from the distribution
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: "1.23"
           cache: false
@@ -104,7 +104,7 @@ jobs:
     name: Demo stack (compose)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Simulated Asterisk, exporter, Prometheus and Grafana
         shell: bash
         run: ./hack/demo-smoke-test.sh 2>&1 | tee "$RUNNER_TEMP/demo.log"
